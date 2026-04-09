@@ -70,7 +70,7 @@ async def upsert_long_term_memory(db: AsyncSession, user_id: int, key: str, valu
         select(LongTermMemory).where(
             LongTermMemory.user_id == user_id,
             LongTermMemory.key == key,
-            LongTermMemory.is_active == True,
+            LongTermMemory.is_active.is_(True),
         )
     )
     existing = result.scalar_one_or_none()
@@ -86,7 +86,7 @@ async def get_long_term_memory(db: AsyncSession, user_id: int) -> list[dict]:
     result = await db.execute(
         select(LongTermMemory).where(
             LongTermMemory.user_id == user_id,
-            LongTermMemory.is_active == True,
+            LongTermMemory.is_active.is_(True),
         )
     )
     items = result.scalars().all()

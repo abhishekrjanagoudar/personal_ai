@@ -148,16 +148,19 @@ async def list_sessions(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    from sqlalchemy import select, distinct
+    from sqlalchemy import select, func
     from app.models.memory import ConversationMessage
-    result = await db.execute(
+    # Use subquery to get the first created_at per session (SQLite compatible)
+    subq = (
         select(
             ConversationMessage.session_id,
-            ConversationMessage.created_at,
+            func.min(ConversationMessage.created_at).label("created_at"),
         )
         .where(ConversationMessage.user_id == current_user.id)
-        .order_by(ConversationMessage.created_at.desc())
-        .distinct(ConversationMessage.session_id)
+        .group_by(ConversationMessage.session_id)
+        .order_by(func.min(ConversationMessage.created_at).desc())
+        .subquery()
     )
+    result = await db.execute(select(subq))
     rows = result.all()
     return {"sessions": [{"session_id": r.session_id, "created_at": r.created_at.isoformat()} for r in rows]}

@@ -38,11 +38,21 @@ def decode_access_token(token: str) -> Optional[dict]:
 
 
 def _get_fernet() -> Fernet:
+    """
+    Load the Fernet encryption key.
+    Uses ENCRYPTION_KEY env var if set (recommended for production).
+    Falls back to a key derived from a dedicated salt — NOT the JWT secret key —
+    to maintain separation of concerns between auth and encryption.
+    """
     key = settings.encryption_key
     if not key:
-        # Generate a stable key from the secret_key for development
+        # Development fallback: use a fixed salt that is unrelated to the JWT key.
+        # WARNING: In production, set ENCRYPTION_KEY to a random Fernet key.
         import hashlib
-        raw = hashlib.sha256(settings.secret_key.encode()).digest()
+        # Use a static application-level salt (not the JWT secret) as the base.
+        # This avoids coupling JWT rotation with API-key accessibility.
+        _FALLBACK_SALT = b"personal-ai-api-key-encryption-v1"
+        raw = hashlib.sha256(_FALLBACK_SALT).digest()
         key = base64.urlsafe_b64encode(raw).decode()
     return Fernet(key.encode() if isinstance(key, str) else key)
 

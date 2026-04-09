@@ -39,8 +39,8 @@ async def open_url(url: str) -> dict:
     try:
         await asyncio.create_subprocess_exec(cmd, url)
         return {"success": True, "message": f"Opening URL: {url}"}
-    except Exception as e:
-        return {"success": False, "message": str(e)}
+    except Exception:
+        return {"success": False, "message": "Failed to open URL."}
 
 
 async def launch_app(app_name: str) -> dict:
@@ -65,8 +65,8 @@ async def launch_app(app_name: str) -> dict:
     try:
         await asyncio.create_subprocess_shell(cmd)
         return {"success": True, "message": f"Launched: {app_name}"}
-    except Exception as e:
-        return {"success": False, "message": str(e)}
+    except Exception:
+        return {"success": False, "message": "Failed to launch application."}
 
 
 def list_available_apps() -> list[str]:

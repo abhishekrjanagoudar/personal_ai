@@ -28,12 +28,13 @@ export function VoiceCalibration({ onComplete, onSkip }: VoiceCalibrationProps) 
 
   const { isListening, isSupported, startListening, stopListening } = useVoice({
     onResult: (transcript) => {
-      setRecordings((prev) => [...prev, transcript]);
+      const updated = [...recordings, transcript];
+      setRecordings(updated);
       setStatus("idle");
       if (step < CALIBRATION_PHRASES.length - 1) {
         setStep((s) => s + 1);
       } else {
-        handleComplete(recordings);
+        handleComplete(updated);
       }
     },
   });
