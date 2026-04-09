@@ -1,0 +1,10 @@
+# Backend
+backend/venv/
+backend/*.db
+backend/*.sqlite
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+
+# Logs
+*.log
